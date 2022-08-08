@@ -50,7 +50,7 @@ def create_cupcake():
     flavor = request.json["flavor"]
     size = request.json["size"]
     rating = request.json["rating"]
-    image = request.json["image"]
+    image = request.json["image"] or None
 
     cupcake = Cupcake(flavor=flavor, size=size, rating=rating, image=image)
 
@@ -62,3 +62,34 @@ def create_cupcake():
     # returns tuple (json, status_code)
     return (jsonify(cupcake = serialized), 201)
 
+
+@app.patch("/api/cupcakes/<int:cupcake_id>")
+def update_cupcake(cupcake_id):
+    """Update a specific cupcake from form data
+    & return JSON {cupcake: {id, flavor, size, rating, image}}"""
+
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    cupcake.flavor = request.json["flavor"] or cupcake.flavor
+    cupcake.size = request.json["size"] or cupcake.size
+    cupcake.rating = request.json["rating"] or cupcake.rating
+    cupcake.image = request.json["image"] or cupcake.image
+
+    db.session.commit()
+
+    serialized = cupcake.serialize()
+
+    return jsonify(cupcake = serialized)
+
+@app.delete("/api/cupcakes/<int:cupcake_id>")
+def delete_cupcake(cupcake_id):
+    """ Delete a specific cupcake
+    & return JSON {deleted: [cupcake_id]}"""
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    db.session.delete(cupcake)
+    db.session.commit()
+
+    return jsonify(deleted = cupcake_id)

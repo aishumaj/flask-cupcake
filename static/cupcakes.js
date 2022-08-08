@@ -13,13 +13,15 @@ function cupcakeHTML(cupcake) {
   </li>`
 }
 
-/** */
+/** Get information on all cupcakes in database,
+ * return array [{cupcake1}, {cupcake2}, ...].
+*/
 async function getCupcakes(){
   const cupcakeData = await axios.get(`${BASE_URL}/cupcakes`);
   return cupcakeData.data.cupcakes;
 }
 
-// put them into list items
+/** Put cupcakes into listhome */
 async function appendCupcakesToList(){
   let cupcakes = await getCupcakes();
 

@@ -1,6 +1,6 @@
 """Flask app for Cupcakes"""
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, Cupcake
@@ -21,6 +21,14 @@ app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 # app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
+
+
+
+@app.get("/")
+def homepage():
+    """Render homepage."""
+
+    return render_template("index.html")
 
 
 @app.get("/api/cupcakes")
@@ -93,3 +101,7 @@ def delete_cupcake(cupcake_id):
     db.session.commit()
 
     return jsonify(deleted = cupcake_id)
+
+
+
+

@@ -116,10 +116,8 @@ class CupcakeViewsTestCase(TestCase):
 
             CUPCAKE_MODIFY = {
                 "flavor": "TestFlavor4",
-                 "size": "",
-                 "rating": 6,
-                 "image": ""
-                }
+                "rating": 6,
+            }
 
             resp = client.patch(url, json=CUPCAKE_MODIFY)
 
@@ -145,6 +143,36 @@ class CupcakeViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 200)
             data = resp.json
-            self.assertEqual(data, {"deleted": self.cupcake.id} )
+            self.assertEqual(data, {"deleted": self.cupcake.id})
 
+    def test_get_404_cupcake(self):
+        """Test that a 404 cupcake is not returned"""
+        with app.test_client() as client:
+            url = f"/api/cupcakes/999"
+            resp = client.get(url)
 
+            self.assertEqual(resp.status_code, 404)
+
+    def test_update_404_cupcake(self):
+        """ Test that inexisting cupcake cannot be updated and retuns a 404 error. """
+        with app.test_client() as client:
+            url = f"/api/cupcakes/999"
+
+            CUPCAKE_MODIFY = {
+                "flavor": "TestFlavor4",
+                "size": "",
+                "rating": 6,
+                "image": ""
+            }
+
+            resp = client.patch(url, json=CUPCAKE_MODIFY)
+            self.assertEqual(resp.status_code, 404)
+
+    def test_delete_cupcake(self):
+        """Test that a specific cupcake is deleted"""
+        with app.test_client() as client:
+            url = f"/api/cupcakes/999"
+
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 404)

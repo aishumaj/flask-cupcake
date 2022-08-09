@@ -50,6 +50,18 @@ def get_cupcake_by_id(cupcake_id):
 
     return jsonify(cupcake = serialized)
 
+@app.get("/api/cupcakes/search")
+def get_cupcake_by_flavor():
+    """Filter cupcake by flavor
+    & return JSON {cupcake: {id, flavor, size, rating, image}}"""
+
+    flavor = request.args.get('flavor')
+
+    cupcakes = Cupcake.query.filter(Cupcake.flavor.ilike(f"%{flavor}%")).all()
+    serialized = [c.serialize() for c in cupcakes]
+
+    return jsonify(cupcakes = serialized)
+
 @app.post("/api/cupcakes")
 def create_cupcake():
     """Create a new cupcake from data

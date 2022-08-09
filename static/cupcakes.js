@@ -4,13 +4,14 @@ const BASE_URL = "http://localhost:5001/api";
 
 const $cupcakeList = $("#cupcake-list");
 const $cupcakeAddForm = $("#add-cupcake-form");
+const $cupcakeSearchForm = $("#search-form");
 
 /** Generate HTML to input into empty list with details for each cupcake */
 function cupcakeHTML(cupcake) {
-  return `<li>
-    ${cupcake.flavor} | ${cupcake.size} | ${cupcake.rating}
-    <img src="${cupcake.image}">
-  </li>`;
+  const $cupcakeImg = $("<img>").attr("src", `${cupcake.image}`);
+  const $newCupcake = $("<li>").text(`${cupcake.flavor} | ${cupcake.size} | ${cupcake.rating}`).append($cupcakeImg);
+
+  return $newCupcake;
 }
 
 /** Get information on all cupcakes in database,
@@ -23,14 +24,13 @@ async function getCupcakes() {
 
 /** Put cupcakes into listhome */
 async function appendCupcakesToList() {
-  let cupcakes = await getCupcakes();
+  const cupcakes = await getCupcakes();
 
   for (let cupcake of cupcakes) {
-    const cupcakeInfo = cupcakeHTML(cupcake);
-    $cupcakeList.append(cupcakeInfo);
+    const $cupcakeInfo = cupcakeHTML(cupcake);
+    $cupcakeList.append($cupcakeInfo);
   }
 }
-
 
 /**
  * Handles the form submission and grabs the input data
@@ -48,8 +48,8 @@ async function submitNewCupcake(evt) {
 
   const newCupcake = await addCupcake(flavor, size, rating, image);
 
-  const cupcakeInfo = cupcakeHTML(newCupcake);
-  $cupcakeList.append(cupcakeInfo);
+  const $cupcakeInfo = cupcakeHTML(newCupcake);
+  $cupcakeList.append($cupcakeInfo);
 
   $cupcakeAddForm.trigger("reset");
 }
@@ -66,12 +66,40 @@ $cupcakeAddForm.on("submit", submitNewCupcake);
 
 async function addCupcake(flavor, size, rating, image) {
   const response = await axios.post(`${BASE_URL}/cupcakes`, {
-    flavor: flavor,
-    size: size,
-    rating: rating,
-    image: image
+    flavor,
+    size,
+    rating,
+    image
   });
   return response.data.cupcake;
+}
+
+async function submitCupcakeSearch(evt) {
+  evt.preventDefault();
+
+  $cupcakeList.empty();
+
+  const flavor = $("#search-input").val();
+  console.log("flavor", flavor);
+  const cupcakesResults = await searchCupcake(flavor);
+  console.log("cupcakesResults", cupcakesResults);
+  if (cupcakesResults.length === 0) {
+    alert(`No cupcakes found with ${flavor} flavor`);
+  }
+
+  for (let cupcake of cupcakesResults) {
+    const $cupcakeInfo = cupcakeHTML(cupcake);
+    $cupcakeList.append($cupcakeInfo);
+
+  }
+  $cupcakeSearchForm.trigger("reset");
+}
+
+$cupcakeSearchForm.on("submit", submitCupcakeSearch);
+
+async function searchCupcake(flavor) {
+  const response = await axios.get(`${BASE_URL}/cupcakes/search?flavor=${flavor}`);
+  return response.data.cupcakes;
 }
 
 //start function

@@ -1,6 +1,6 @@
 "use strict";
 
-const BASE_URL = "http://localhost:5001/api";
+const BASE_URL = "http://localhost:5000/api";
 
 const $cupcakeList = $("#cupcake-list");
 const $cupcakeAddForm = $("#add-cupcake-form");
